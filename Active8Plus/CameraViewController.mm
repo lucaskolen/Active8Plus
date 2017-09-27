@@ -95,11 +95,18 @@
     [aryCapturedPhoto removeAllObjects];
 }
 
-- (void)viewWillLayoutSubviews
+//- (void)viewWillLayoutSubviews
+//{
+//    [super viewWillLayoutSubviews];
+//    
+//    self.camera.view.frame = CGRectMake(0.0f, 0.0f, self.cameraView.frame.size.width, self.cameraView.frame.size.height);
+//}
+
+-(void) viewDidLayoutSubviews
 {
-    [super viewWillLayoutSubviews];
-    
-    self.camera.view.frame = CGRectMake(0.0f, 0.0f, self.cameraView.frame.size.width, self.cameraView.frame.size.height);
+    [super viewDidLayoutSubviews];
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    self.camera.view.frame = CGRectMake(0.0f, 0.0f, screenSize.width, screenSize.height);
 }
 
 - (void) initControl {
@@ -138,7 +145,7 @@
     _txtMin.text            = [NSString stringWithFormat:@"%.02f", DEFAULT_MIN_VALUE];
     _txtMax.text            = [NSString stringWithFormat:@"%.02f", DEFAULT_MAX_VALUE];
     
-    _constraintChromakeySettingViewBottom.constant = -200;
+    _constraintChromakeySettingViewBottom.constant = -240;
     _constraintMediaTypeSettingViewBottom.constant = - 200;
     _constraintVideoSettingViewBottom.constant = -200;
     _constraintAnimatedGifSettingViewBottom.constant = -200;
@@ -523,7 +530,7 @@ static float fCurrentTime = 0;
 
 - (IBAction)onCancel:(id)sender {
     [UIView animateWithDuration:0.3 animations:^{
-        _constraintChromakeySettingViewBottom.constant = -200;
+        _constraintChromakeySettingViewBottom.constant = -240;
         [self.viewChromakeySetting layoutIfNeeded];
     }];
 }
