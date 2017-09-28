@@ -29,6 +29,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imgBG;
 @property (weak, nonatomic) IBOutlet UIView *viewMerge;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewOverlay;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *mergeViewHeight;
 
 @end
 
@@ -43,13 +44,29 @@
     
 }
 
-- (void) viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
+//- (void) viewDidAppear:(BOOL)animated {
+//    [super viewDidAppear:animated];
+//    
+//    [self initUI];
+//}
+
+-(void) viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
     
     [self initUI];
 }
 
 - (void) initUI {
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    
+    float mergeViewWidth = screenSize.width * 700 / 1024.0f;
+    if (screenSize.width > screenSize.height) {
+        self.mergeViewHeight.constant = mergeViewWidth * 2 / 3.0f;
+    } else {
+        self.mergeViewHeight.constant = mergeViewWidth * 3 / 2.0f;
+    }
+    
+    [self.view layoutIfNeeded];
     
     self.imageViewOverlay.image = self.imgOverlay;
     self.imageViewOverlay.userInteractionEnabled = NO;
@@ -156,6 +173,8 @@
 }
 
 - (UIImage *) mergeImages:(UIImage *)chromakeyImage  {
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    
     CGFloat radians = atan2f(img_Sticker.originalTransform.b, img_Sticker.originalTransform.a);
     CGFloat degrees = radians * (180 / M_PI);
     
@@ -165,19 +184,39 @@
     [UIImage imageWithCGImage:chromakeyImage.CGImage];
     
     CGSize newSize = CGSizeMake(DEFAULT_MEDIA_WIDTH, DEFAULT_MEDIA_HEIGHT);
+    if (screenSize.height > screenSize.width) {
+        newSize = CGSizeMake(DEFAULT_MEDIA_HEIGHT, DEFAULT_MEDIA_WIDTH);
+    }
     UIGraphicsBeginImageContext(newSize);
     
-    // Use existing opacity as is
-    [bottomImage drawInRect:CGRectMake(0,0,DEFAULT_MEDIA_WIDTH,DEFAULT_MEDIA_HEIGHT)];
     
-    // Apply supplied opacity if applicable
-    // Change xPos, yPos if applicable
     
-    [image drawInRect:CGRectMake(img_Sticker.frame.origin.x * (DEFAULT_MEDIA_WIDTH / self.viewMerge.frame.size.width),
-                                 img_Sticker.frame.origin.y * (DEFAULT_MEDIA_HEIGHT / self.viewMerge.frame.size.height),
-                                 img_Sticker.frame.size.width * (DEFAULT_MEDIA_WIDTH / self.viewMerge.frame.size.width),
-                                 img_Sticker.frame.size.height * (DEFAULT_MEDIA_HEIGHT / self.viewMerge.frame.size.height))
-            blendMode:kCGBlendModeNormal alpha:1.0];
+    if (screenSize.width > screenSize.height) {
+        // Use existing opacity as is
+        [bottomImage drawInRect:CGRectMake(0,0,DEFAULT_MEDIA_WIDTH,DEFAULT_MEDIA_HEIGHT)];
+        
+        // Apply supplied opacity if applicable
+        // Change xPos, yPos if applicable
+        [image drawInRect:CGRectMake(img_Sticker.frame.origin.x * (DEFAULT_MEDIA_WIDTH / self.viewMerge.frame.size.width),
+                                     img_Sticker.frame.origin.y * (DEFAULT_MEDIA_HEIGHT / self.viewMerge.frame.size.height),
+                                     img_Sticker.frame.size.width * (DEFAULT_MEDIA_WIDTH / self.viewMerge.frame.size.width),
+                                     img_Sticker.frame.size.height * (DEFAULT_MEDIA_HEIGHT / self.viewMerge.frame.size.height))
+                blendMode:kCGBlendModeNormal alpha:1.0];
+        
+        
+    } else {
+        [bottomImage drawInRect:CGRectMake(0,0, DEFAULT_MEDIA_HEIGHT, DEFAULT_MEDIA_WIDTH)];
+        [image drawInRect:CGRectMake(img_Sticker.frame.origin.x * (DEFAULT_MEDIA_HEIGHT / self.viewMerge.frame.size.width),
+                                     img_Sticker.frame.origin.y * (DEFAULT_MEDIA_WIDTH / self.viewMerge.frame.size.height),
+                                     img_Sticker.frame.size.width * (DEFAULT_MEDIA_HEIGHT / self.viewMerge.frame.size.width),
+                                     img_Sticker.frame.size.height * (DEFAULT_MEDIA_WIDTH / self.viewMerge.frame.size.height))
+                blendMode:kCGBlendModeNormal alpha:1.0];
+    }
+    
+    
+    
+    
+    
     
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
     

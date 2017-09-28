@@ -149,7 +149,9 @@
     _constraintMediaTypeSettingViewBottom.constant = - 200;
     _constraintVideoSettingViewBottom.constant = -200;
     _constraintAnimatedGifSettingViewBottom.constant = -200;
-    _constraintTimeProgressRight.constant = self.view.frame.size.width;
+    
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    _constraintTimeProgressRight.constant = screenSize.width;
     
     if(![[NSUserDefaults standardUserDefaults] objectForKey:PHOTOTYPE]) {
         [[NSUserDefaults standardUserDefaults] setObject:STANDARDPHOTO forKey:PHOTOTYPE];
@@ -337,6 +339,8 @@
 
 - (IBAction)onCapture:(id)sender {
     
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    
     NSString *strType = [[NSUserDefaults standardUserDefaults] objectForKey:PHOTOTYPE];
     if([strType isEqualToString:VIDEO]) {
         if(!self.camera.isRecording) {
@@ -359,7 +363,7 @@
             [recordingTimer invalidate];
             recordingTimer = nil;
             
-            _constraintTimeProgressRight.constant = self.view.frame.size.width;
+            _constraintTimeProgressRight.constant = screenSize.width;
             
             [self.btnCapture setImage:[UIImage imageNamed:@"btn_camera"] forState:UIControlStateNormal];
             [self.camera stopRecording];
@@ -425,6 +429,7 @@
 static float fCurrentTime = 0;
 - (void) checkTimer {
     fCurrentTime += TIMEMR_INTERVAL;
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
     
     NSInteger nMaxVideoLength = 30;
     if([[NSUserDefaults standardUserDefaults] objectForKey:DEFAULT_VIDEOLENGTH]) {
@@ -441,11 +446,11 @@ static float fCurrentTime = 0;
         [recordingTimer invalidate];
         recordingTimer = nil;
         
-        _constraintTimeProgressRight.constant = self.view.frame.size.width;
+        _constraintTimeProgressRight.constant = screenSize.width;
         return;
     }
     
-    _constraintTimeProgressRight.constant = self.view.frame.size.width - (self.view.frame.size.width / nMaxVideoLength) * fCurrentTime;
+    _constraintTimeProgressRight.constant = screenSize.width - (screenSize.width / nMaxVideoLength) * fCurrentTime;
 }
 
 - (IBAction)onSetting:(id)sender {
@@ -619,6 +624,8 @@ static float fCurrentTime = 0;
 #pragma  mark - Add Overlay to video
 - (void) addOverlayImageToVideo {
     
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     hud.label.text = @"Processing Video...";
     
@@ -663,6 +670,11 @@ static float fCurrentTime = 0;
     float fVideoScaleX = DEFAULT_MEDIA_WIDTH / videoAssetTrack.naturalSize.width;
     float fVideoScaleY = DEFAULT_MEDIA_HEIGHT / videoAssetTrack.naturalSize.height;
     
+    if (screenSize.height > screenSize.width) {
+        fVideoScaleX = DEFAULT_MEDIA_HEIGHT / videoAssetTrack.naturalSize.width;
+        fVideoScaleY = DEFAULT_MEDIA_WIDTH / videoAssetTrack.naturalSize.height;
+    }
+    
     CGAffineTransform videoScale = CGAffineTransformMakeScale(fVideoScaleX, fVideoScaleY);
     [videolayerInstruction setTransform:videoScale atTime:kCMTimeZero];
     [videolayerInstruction setOpacity:0.0 atTime:self.videoAsset.duration];
@@ -682,12 +694,22 @@ static float fCurrentTime = 0;
     float renderWidth, renderHeight;
     renderWidth = DEFAULT_MEDIA_WIDTH;
     renderHeight = DEFAULT_MEDIA_HEIGHT;
+    
+    if (screenSize.height > screenSize.width) {
+        renderWidth = DEFAULT_MEDIA_HEIGHT;
+        renderHeight = DEFAULT_MEDIA_WIDTH;
+    }
+    
     mainCompositionInst.renderSize = CGSizeMake(renderWidth, renderHeight);
     mainCompositionInst.instructions = [NSArray arrayWithObject:mainInstruction];
     mainCompositionInst.frameDuration = CMTimeMake(1, 30);
     
+    if (screenSize.width > screenSize.height) {
+        [self applyVideoEffectsToComposition:mainCompositionInst size:CGSizeMake(DEFAULT_MEDIA_WIDTH, DEFAULT_MEDIA_HEIGHT)];
+    } else {
+        [self applyVideoEffectsToComposition:mainCompositionInst size:CGSizeMake(DEFAULT_MEDIA_HEIGHT, DEFAULT_MEDIA_WIDTH)];
+    }
     
-    [self applyVideoEffectsToComposition:mainCompositionInst size:CGSizeMake(DEFAULT_MEDIA_WIDTH, DEFAULT_MEDIA_HEIGHT)];
     
     // 4 - Get path
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];

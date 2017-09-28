@@ -48,6 +48,7 @@
 @property (weak, nonatomic) IBOutlet UITableView *tblUserList;
 @property (weak, nonatomic) IBOutlet UIButton *btnUserListDone;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *constraintUserlistRight;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *mainViewHeight;
 
 @property (strong, nonatomic) AVPlayer *avPlayer;
 @property (strong, nonatomic) AVPlayerLayer *avPlayerLayer;
@@ -103,7 +104,24 @@ NSString * const kMetricsAppTypeHP = @"HP";
     [MP sharedInstance].printPaperDelegate = self;
 }
 
+-(void) viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
+    
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    float mainViewWidth = screenSize.width - 260;
+    
+    if (screenSize.width > screenSize.height) {
+        self.mainViewHeight.constant = mainViewWidth * 2 / 3.0f;
+    } else {
+        self.mainViewHeight.constant = mainViewWidth * 3 / 2.0f;
+    }
+    [self.view layoutIfNeeded];
+    
+}
+
 - (void) initUI {
+    
     self.viewEmailAddress.layer.cornerRadius = 3.f;
     self.viewEmailAddress.clipsToBounds = YES;
     self.viewEmailAddress.layer.borderColor = [UIColor lightGrayColor].CGColor;

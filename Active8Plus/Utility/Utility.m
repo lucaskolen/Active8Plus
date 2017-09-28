@@ -107,8 +107,14 @@
 }
 
 - (UIImage *)resizeImage:(UIImage *)image {
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
     
     CGSize newSize = CGSizeMake(DEFAULT_MEDIA_WIDTH, DEFAULT_MEDIA_HEIGHT);
+    
+    if (screenSize.width < screenSize.height) {
+        newSize = CGSizeMake(DEFAULT_MEDIA_HEIGHT, DEFAULT_MEDIA_WIDTH);
+    }
+    
     UIGraphicsBeginImageContext(newSize);
     [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
