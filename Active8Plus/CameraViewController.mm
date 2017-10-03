@@ -353,6 +353,8 @@
                                  URLByAppendingPathComponent:@"test"] URLByAppendingPathExtension:@"mov"];
             [[NSFileManager defaultManager] removeItemAtURL:outputURL error:NULL];
             
+            self.camera.useDeviceOrientation = YES;
+            
             [self.camera startRecordingWithOutputUrl:outputURL didRecord:^(LLSimpleCamera *camera, NSURL *outputFileUrl, NSError *error) {
                 [self addOverlayImageToVideo];
             }];
@@ -413,7 +415,7 @@
 }
 
 - (void) saveStandardImage:(UIImage*) image {
-    
+
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"yyyyMMdd_hhmmss"];
     
@@ -648,9 +650,12 @@ static float fCurrentTime = 0;
     
     // 3.2 - Create an AVMutableVideoCompositionLayerInstruction for the video track and fix the orientation.
     AVMutableVideoCompositionLayerInstruction *videolayerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:videoTrack];
+    
     AVAssetTrack *videoAssetTrack = [[self.videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+    
     UIImageOrientation videoAssetOrientation_  = UIImageOrientationUp;
     BOOL isVideoAssetPortrait_  = NO;
+    
     CGAffineTransform videoTransform = videoAssetTrack.preferredTransform;
     if (videoTransform.a == 0 && videoTransform.b == 1.0 && videoTransform.c == -1.0 && videoTransform.d == 0) {
         videoAssetOrientation_ = UIImageOrientationRight;
@@ -679,8 +684,18 @@ static float fCurrentTime = 0;
     [videolayerInstruction setTransform:videoScale atTime:kCMTimeZero];
     [videolayerInstruction setOpacity:0.0 atTime:self.videoAsset.duration];
     
+    
+    /////////========
+//    AVMutableVideoCompositionLayerInstruction *firstlayerInstruction = [AVMutableVideoCompositionLayerInstruction                                                                    videoCompositionLayerInstructionWithAssetTrack:videoTrack];
+//    [firstlayerInstruction setTransform:videoScale atTime:kCMTimeZero];
+//    [firstlayerInstruction setTransform:CGAffineTransformMakeRotation(M_PI/4) atTime:kCMTimeZero];
+//    
+//    [firstlayerInstruction setOpacity:0.0 atTime:self.videoAsset.duration];
+    
+    /////==============
+    
     // 3.3 - Add instructions
-    mainInstruction.layerInstructions = [NSArray arrayWithObjects:videolayerInstruction,nil];
+    mainInstruction.layerInstructions = [NSArray arrayWithObjects:videolayerInstruction, nil];
     
     AVMutableVideoComposition *mainCompositionInst = [AVMutableVideoComposition videoComposition];
     
@@ -753,8 +768,28 @@ static float fCurrentTime = 0;
     // 2 - set up the parent layer
     CALayer *parentLayer = [CALayer layer];
     CALayer *videoLayer = [CALayer layer];
+    
+    UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+    switch (deviceOrientation) {
+        case UIDeviceOrientationPortrait:
+            [videoLayer setTransform:CATransform3DMakeRotation(-M_PI/2, 0, 0, 1)];
+            break;
+        case UIDeviceOrientationPortraitUpsideDown:
+            [videoLayer setTransform:CATransform3DMakeRotation(M_PI/2, 0, 0, 1)];
+            break;
+        case UIDeviceOrientationLandscapeLeft:
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            [videoLayer setTransform:CATransform3DMakeRotation(M_PI, 0, 0, 1)];
+            break;
+        default:
+            break;
+    }
+    
     parentLayer.frame = CGRectMake(0, 0, size.width, size.height);
     videoLayer.frame = CGRectMake(0, 0, size.width, size.height);
+    
+    
     [parentLayer addSublayer:videoLayer];
     [parentLayer addSublayer:overlayLayer];
     

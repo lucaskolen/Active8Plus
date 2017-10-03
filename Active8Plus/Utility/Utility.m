@@ -93,7 +93,13 @@
     
     [UIImage imageWithCGImage:chromakeyImage.CGImage];
     
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    
     CGSize newSize = CGSizeMake(imgOverlay.size.width, imgOverlay.size.height);
+    if (screenSize.width < screenSize.height) {
+        newSize = CGSizeMake(imgOverlay.size.height, imgOverlay.size.width);
+    }
+    
     UIGraphicsBeginImageContext(newSize);
     
 

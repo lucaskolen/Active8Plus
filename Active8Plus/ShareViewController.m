@@ -118,6 +118,19 @@ NSString * const kMetricsAppTypeHP = @"HP";
     }
     [self.view layoutIfNeeded];
     
+    if([[NSUserDefaults standardUserDefaults] objectForKey:PHOTOTYPE]) {
+        NSString *strType = [[NSUserDefaults standardUserDefaults] objectForKey:PHOTOTYPE];
+        if([strType isEqualToString:VIDEO]) {
+            
+            self.avPlayerLayer.frame = CGRectMake(_imgView.frame.origin.x, _imgView.frame.origin.y, _imgView.frame.size.width, _imgView.frame.size.height);
+            [self.avPlayer play];
+            
+            [self.btnVideoPlay setFrame:CGRectMake(self.mainView.frame.size.width/2-125, self.mainView.frame.size.height/2-125, 250, 250)];
+            
+            [_imgView setHidden:YES];
+        }
+    }
+    
 }
 
 - (void) initUI {

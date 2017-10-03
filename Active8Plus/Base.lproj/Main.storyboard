@@ -1546,13 +1546,13 @@
                                                     </constraints>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SKp-ZW-7O5">
-                                                    <rect key="frame" x="79.5" y="10" width="755.5" height="23.5"/>
+                                                    <rect key="frame" x="79.5" y="10" width="1087.5" height="23.5"/>
                                                     <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="28"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rho-B8-JFi">
-                                                    <rect key="frame" x="843" y="10" width="128" height="23.5"/>
+                                                    <rect key="frame" x="1175" y="10" width="128" height="23.5"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="128" id="nOS-ZM-JAl"/>
                                                     </constraints>
