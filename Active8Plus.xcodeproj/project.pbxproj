@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0648361C1F8874AE00478865 /* SelectOverlayTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0648361B1F8874AE00478865 /* SelectOverlayTableViewCell.m */; };
 		764091823659C530741F8494 /* libPods-Active8Plus.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C359B24B9B9423ADEAA92E09 /* libPods-Active8Plus.a */; };
 		9F10329A1F1E8194004E59F1 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F1032991F1E8194004E59F1 /* MessageUI.framework */; };
 		9F1032A41F1E85C4004E59F1 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 9F1032A31F1E85C4004E59F1 /* NSData+Base64.m */; };
@@ -61,6 +62,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0648361A1F8874AE00478865 /* SelectOverlayTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectOverlayTableViewCell.h; sourceTree = "<group>"; };
+		0648361B1F8874AE00478865 /* SelectOverlayTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectOverlayTableViewCell.m; sourceTree = "<group>"; };
 		37255564A8F8222A60F2E94A /* libPods-Active8PlusTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Active8PlusTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C27288D352D93852F14B0A8 /* Pods-Active8PlusTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Active8PlusTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Active8PlusTests/Pods-Active8PlusTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DB22BE73DA4A535D6FE81AA /* Pods-Active8PlusTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Active8PlusTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Active8PlusTests/Pods-Active8PlusTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -256,6 +259,8 @@
 				9F743A111F1109020076FF35 /* LaunchScreen.storyboard */,
 				9F743A141F1109020076FF35 /* Info.plist */,
 				9F743A031F1109010076FF35 /* Supporting Files */,
+				0648361A1F8874AE00478865 /* SelectOverlayTableViewCell.h */,
+				0648361B1F8874AE00478865 /* SelectOverlayTableViewCell.m */,
 			);
 			path = Active8Plus;
 			sourceTree = "<group>";
@@ -631,6 +636,7 @@
 				9F458C631F11C7B600867708 /* ChromakeyCollectionViewCell.m in Sources */,
 				FCBA9DF71F6707310096C583 /* Reachability.m in Sources */,
 				FCA7D9A11F72919F00B02D4A /* MPLearnMoreView.m in Sources */,
+				0648361C1F8874AE00478865 /* SelectOverlayTableViewCell.m in Sources */,
 				FCBA9DF11F663BA90096C583 /* SettingTableViewCell.m in Sources */,
 				9F458C701F11D95800867708 /* TouchImageView_Private.m in Sources */,
 				FCA7D9A31F72919F00B02D4A /* MPLearnMoreViewController.m in Sources */,

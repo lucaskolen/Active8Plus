@@ -13,4 +13,7 @@
 @property (strong, nonatomic) UIImage           *imgChromakey;
 @property (strong, nonatomic) NSMutableArray    *aryCapturedPhoto;
 @property (strong, nonatomic) UIImage           *imgOverlay;
+
+@property (strong, nonatomic) NSArray           *arrBackground;
+
 @end

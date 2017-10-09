@@ -10,6 +10,7 @@
 #import "ChromakeyViewController.h"
 #import "ShareViewController.h"
 #import "SettingViewController.h"
+#import "SelectOverlayTableViewCell.h"
 #import "Chromagic.h"
 #import "APIManager.h"
 #import <MBProgressHUD.h>
@@ -75,14 +76,23 @@
 @property (strong, nonatomic) LLSimpleCamera    *camera;
 @property (weak, nonatomic) IBOutlet UIImageView *imgOverlay;
 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *constraintSelectOverlayViewRight;
 
 @end
 
 @implementation CameraViewController
+@synthesize arrLandscapeOverlays;
+@synthesize arrPortraitOverlays;
+@synthesize arrOverlays;
+
+@synthesize overlayTable;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    arrOverlays = [[NSMutableArray alloc] init];
+    arrLandscapeOverlays = [[NSMutableArray alloc] init];
+    arrPortraitOverlays = [[NSMutableArray alloc] init];
     
     [self initControl];
 }
@@ -91,22 +101,29 @@
 {
     [super viewWillAppear:animated];
     
+    _constraintSelectOverlayViewRight.constant = -200;
+    
     [self.camera start];
     [aryCapturedPhoto removeAllObjects];
 }
 
-//- (void)viewWillLayoutSubviews
-//{
-//    [super viewWillLayoutSubviews];
-//    
-//    self.camera.view.frame = CGRectMake(0.0f, 0.0f, self.cameraView.frame.size.width, self.cameraView.frame.size.height);
-//}
 
 -(void) viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
     CGSize screenSize = [UIScreen mainScreen].bounds.size;
     self.camera.view.frame = CGRectMake(0.0f, 0.0f, screenSize.width, screenSize.height);
+    
+    if ([self isLandscape]) {
+        arrOverlays = arrLandscapeOverlays;
+    } else {
+        arrOverlays = arrPortraitOverlays;
+    }
+    _imgOverlay.image = nil;
+    if (arrOverlays.count > 0) {
+        [[Utility sharedUtility] setImageURLWithAsync:[arrOverlays[0] objectForKey:@"filename"] displayImgView:_imgOverlay placeholder:@""];
+    }
+    [self.overlayTable reloadData];
 }
 
 - (void) initControl {
@@ -227,8 +244,30 @@
         if(_response) {
             if([[_response objectForKey:@"status"] isEqualToString:@"success"]) {
                 
-                NSArray *dicData = [_response objectForKey:@"data"];
-                [[Utility sharedUtility] setImageURLWithAsync:[dicData[0] objectForKey:@"filename"] displayImgView:_imgOverlay placeholder:@""];
+                NSArray *arrData = [_response objectForKey:@"data"];
+                arrPortraitOverlays = [[NSMutableArray alloc] init];
+                arrLandscapeOverlays = [[NSMutableArray alloc] init];
+                arrOverlays = [[NSMutableArray alloc] init];
+                
+                for (NSDictionary *dic in arrData) {
+                    NSString *m_mode = [dic valueForKey:@"m_mode"];
+                    if ([m_mode isEqualToString:@"h"]) {
+                        [arrLandscapeOverlays addObject:dic];
+                    } else if ([m_mode isEqualToString:@"v"]) {
+                        [arrPortraitOverlays addObject:dic];
+                    }
+                }
+                
+                if ([self isLandscape]) {
+                    arrOverlays = arrLandscapeOverlays;
+                } else {
+                    arrOverlays = arrPortraitOverlays;
+                }
+                if (arrOverlays.count > 0) {
+                    [[Utility sharedUtility] setImageURLWithAsync:[arrOverlays[0] objectForKey:@"filename"] displayImgView:_imgOverlay placeholder:@""];
+                }
+                [overlayTable reloadData];
+                
             } else {
                 [[Utility sharedUtility] showAlertMessage:self title:@"" message:@"Error! Can't get Overlay Image Please try again."];
             }
@@ -586,6 +625,21 @@ static float fCurrentTime = 0;
     [self.navigationController pushViewController:vc animated:YES];
 }
 
+- (IBAction)onSelectOverlay:(id)sender {
+    [UIView animateWithDuration:0.3 animations:^{
+        _constraintSelectOverlayViewRight.constant = 0;
+        [self.view layoutIfNeeded];
+    }];
+}
+
+- (IBAction)onCloseSelectOverlayView:(id)sender {
+    [UIView animateWithDuration:0.3 animations:^{
+        _constraintSelectOverlayViewRight.constant = -200;
+        [self.view layoutIfNeeded];
+    }];
+}
+
+
 - (BOOL)prefersStatusBarHidden
 {
     return YES;
@@ -796,6 +850,46 @@ static float fCurrentTime = 0;
     // 3 - apply magic
     composition.animationTool = [AVVideoCompositionCoreAnimationTool
                                  videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
+}
+
+-(BOOL) isLandscape {
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    if (screenSize.height > screenSize.width) {
+        return NO;
+    }
+    return YES;
+}
+
+#pragma mark - tableview datasource
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    
+    return arrOverlays.count;
+}
+
+-(UITableViewCell*) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    SelectOverlayTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"SelectOverlayTableViewCell" forIndexPath:indexPath];
+    
+    NSInteger row = [indexPath row];
+    NSURL *url = [NSURL URLWithString:[arrOverlays[row] objectForKey:@"filename"]];
+    NSData *imgData = [NSData dataWithContentsOfURL:url];
+    
+    UIImage *img = [UIImage imageWithData:imgData];
+    cell.imgOverlay.image = img;
+    
+    return cell;
+    
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 200;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSInteger row = [indexPath row];
+    [[Utility sharedUtility] setImageURLWithAsync:[arrOverlays[row] objectForKey:@"filename"] displayImgView:_imgOverlay placeholder:@""];
 }
 
 @end

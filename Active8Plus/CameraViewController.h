@@ -12,8 +12,14 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <AVFoundation/AVFoundation.h>
 
-@interface CameraViewController : UIViewController
+@interface CameraViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 @property(nonatomic, strong) AVAsset *videoAsset;
+@property(nonatomic, strong) NSMutableArray *arrLandscapeOverlays;
+@property(nonatomic, strong) NSMutableArray *arrPortraitOverlays;
+@property(nonatomic, strong) NSMutableArray *arrOverlays;
+
+
+@property (weak, nonatomic) IBOutlet UITableView *overlayTable;
 
 @end

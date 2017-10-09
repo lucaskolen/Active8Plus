@@ -21,7 +21,7 @@
 @interface ChromakeyViewController ()<UICollectionViewDelegate, UICollectionViewDataSource>
 {
     TouchImageView  *img_Sticker;
-    NSMutableArray  *aryBackground;
+//    NSMutableArray  *aryBackground;
     NSMutableArray  *aryMergedPhotos;
 }
 
@@ -34,12 +34,13 @@
 @end
 
 @implementation ChromakeyViewController
+@synthesize arrBackground;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    aryBackground   = [[NSMutableArray alloc] init];
+    arrBackground   = [[NSArray alloc] init];
     aryMergedPhotos = [[NSMutableArray alloc] init];
     
 }
@@ -59,7 +60,7 @@
 - (void) initUI {
     CGSize screenSize = [UIScreen mainScreen].bounds.size;
     
-    float mergeViewWidth = screenSize.width * 700 / 1024.0f;
+    float mergeViewWidth = screenSize.width * 600 / 1024.0f;
     if (screenSize.width > screenSize.height) {
         self.mergeViewHeight.constant = mergeViewWidth * 2 / 3.0f;
     } else {
@@ -95,7 +96,7 @@
     
     [self.viewMerge insertSubview:img_Sticker aboveSubview:self.imgBG];
  
-    if(aryBackground.count> 0)
+    if(arrBackground.count> 0)
         return;
     
     [[APIManager sharedInstance] getBackgroundImage:^(id _response) {
@@ -103,14 +104,23 @@
         if(_response) {
             if([[_response objectForKey:@"status"] isEqualToString:@"success"]) {
                 
-                NSArray *aryData = [_response objectForKey:@"data"];
+                arrBackground = [_response objectForKey:@"data"];
                 
-                for (int i = 0; i < aryData.count; i ++) {
-                    NSDictionary *dic = [aryData objectAtIndex:i];
-                    [aryBackground addObject:[dic objectForKey:@"filename"]];
+                if (arrBackground.count > 0) {
+                    NSString *background = [[arrBackground objectAtIndex:0] valueForKey:@"h_background"];
+                    NSString *overlayUrl = [[arrBackground objectAtIndex:0] valueForKey:@"h_overlay"];
+                    
+                    if (![self isLandscape]) {
+                        background = [[arrBackground objectAtIndex:0] valueForKey:@"v_background"];
+                        overlayUrl = [[arrBackground objectAtIndex:0] valueForKey:@"v_overlay"];
+                    }
+                    NSData *imgData = [NSData dataWithContentsOfURL:[NSURL URLWithString:overlayUrl]];
+                    self.imgOverlay = [UIImage imageWithData:imgData];
+                    self.imageViewOverlay.image = self.imgOverlay;
+                    
+                    [[Utility sharedUtility] setImageURLWithAsync:background displayImgView:_imgBG placeholder:@""];
+                    self.imageViewOverlay.image = self.imgOverlay;
                 }
-                
-                [[Utility sharedUtility] setImageURLWithAsync:[aryBackground objectAtIndex:0] displayImgView:_imgBG placeholder:@""];
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [_collectionView reloadData];
@@ -125,6 +135,14 @@
         [[Utility sharedUtility] showAlertMessage:self title:@"" message:@"Please try again."];
     }];
 
+}
+
+-(BOOL) isLandscape {
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    if (screenSize.height > screenSize.width) {
+        return NO;
+    }
+    return YES;
 }
 
 - (IBAction)onNext:(id)sender {
@@ -307,17 +325,35 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     ChromakeyCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"ChromakeyCollectionViewCell" forIndexPath:indexPath];
     
-    [[Utility sharedUtility] setImageURLWithAsync:[aryBackground objectAtIndex:indexPath.row] displayImgView:cell.imgCell placeholder:@""];
-
+    NSString *background = [[arrBackground objectAtIndex:indexPath.row] valueForKey:@"h_background"];
+    
+    if (![self isLandscape]) {
+        background = [[arrBackground objectAtIndex:indexPath.row] valueForKey:@"v_background"];
+    }
+    
+    [[Utility sharedUtility] setImageURLWithAsync:background displayImgView:cell.imgCell placeholder:@""];
+    
     return cell;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    [[Utility sharedUtility] setImageURLWithAsync:[aryBackground objectAtIndex:indexPath.row] displayImgView:_imgBG placeholder:@""];
+    
+    NSString *background = [[arrBackground objectAtIndex:indexPath.row] valueForKey:@"h_background"];
+    NSString *overlay = [[arrBackground objectAtIndex:indexPath.row] valueForKey:@"h_overlay"];
+    if (![self isLandscape]) {
+        background = [[arrBackground objectAtIndex:indexPath.row] valueForKey:@"v_background"];
+        overlay = [[arrBackground objectAtIndex:indexPath.row] valueForKey:@"v_overlay"];
+    }
+    
+    NSData *imgData = [NSData dataWithContentsOfURL:[NSURL URLWithString:overlay]];
+    self.imgOverlay = [UIImage imageWithData:imgData];
+    self.imageViewOverlay.image = self.imgOverlay;
+    
+    [[Utility sharedUtility] setImageURLWithAsync:background displayImgView:_imgBG placeholder:@""];
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return aryBackground.count;
+    return arrBackground.count;
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
