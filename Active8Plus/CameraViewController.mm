@@ -105,12 +105,17 @@
     
     [self.camera start];
     [aryCapturedPhoto removeAllObjects];
+    
+    
 }
 
 
 -(void) viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
+    
+    [self checkSelectOverlayButton];
+    
     CGSize screenSize = [UIScreen mainScreen].bounds.size;
     self.camera.view.frame = CGRectMake(0.0f, 0.0f, screenSize.width, screenSize.height);
     
@@ -121,9 +126,23 @@
     }
     _imgOverlay.image = nil;
     if (arrOverlays.count > 0) {
-        [[Utility sharedUtility] setImageURLWithAsync:[arrOverlays[0] objectForKey:@"filename"] displayImgView:_imgOverlay placeholder:@""];
+        NSString *strType = [[NSUserDefaults standardUserDefaults] objectForKey:PHOTOTYPE];
+        if ([strType isEqualToString:GREENSCREENPHOTO]) {
+            _imgOverlay.image = nil;
+        } else {
+            [[Utility sharedUtility] setImageURLWithAsync:[arrOverlays[0] objectForKey:@"filename"] displayImgView:_imgOverlay placeholder:@""];
+        }
     }
     [self.overlayTable reloadData];
+}
+
+-(void) checkSelectOverlayButton{
+    NSString *strType = [[NSUserDefaults standardUserDefaults] objectForKey:PHOTOTYPE];
+    if ([strType isEqualToString:GREENSCREENPHOTO]) {
+        [self.btnSelectOverlay setHidden:YES];
+    } else {
+        [self.btnSelectOverlay setHidden:NO];
+    }
 }
 
 - (void) initControl {
@@ -239,8 +258,12 @@
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     hud.label.text = @"Loading";
     
+    NSString *strType = [[NSUserDefaults standardUserDefaults] objectForKey:PHOTOTYPE];
+    
     [[APIManager sharedInstance] getOverlay:^(id _response) {
+        
         [hud hideAnimated:YES];
+        
         if(_response) {
             if([[_response objectForKey:@"status"] isEqualToString:@"success"]) {
                 
@@ -264,7 +287,11 @@
                     arrOverlays = arrPortraitOverlays;
                 }
                 if (arrOverlays.count > 0) {
-                    [[Utility sharedUtility] setImageURLWithAsync:[arrOverlays[0] objectForKey:@"filename"] displayImgView:_imgOverlay placeholder:@""];
+                    if (![strType isEqualToString:GREENSCREENPHOTO]) {
+                        [[Utility sharedUtility] setImageURLWithAsync:[arrOverlays[0] objectForKey:@"filename"] displayImgView:_imgOverlay placeholder:@""];
+                    } else {
+                        _imgOverlay.image = nil;
+                    }
                 }
                 [overlayTable reloadData];
                 
@@ -431,13 +458,14 @@
                     
                     ChromakeyViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"ChromakeyViewController"];
                     vc.imgChromakey             = imgchromaImage;
-                    vc.imgOverlay               = self.imgOverlay.image;//[self chromaTheImage:self.imgOverlay.image];
+                    vc.imgOverlay               = self.imgOverlay.image;
                     
                     [self.navigationController pushViewController:vc animated:YES];
                     
                 } else {
                     UIImage *originImage = [[Utility sharedUtility] resizeImage:image];
-                    UIImage *newImage = [[Utility sharedUtility] mergeImages:originImage overlayImage:self.imgOverlay.image];//[self chromaTheImage:self.imgOverlay.image]];
+                    UIImage *newImage = [[Utility sharedUtility] mergeImages:originImage overlayImage:self.imgOverlay.image];
+                    
                     [self saveStandardImage:newImage];
                     ShareViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"ShareViewController"];
                     vc.imgShare             = newImage;
@@ -460,8 +488,6 @@
     
     [APIManager sharedInstance].m_tmpMediaPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:
                                                   [NSString stringWithFormat:@"standardimage-%@.jpg", [formatter stringFromDate:[NSDate date]]]];
-    
-//    [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
     
     NSData *data = UIImageJPEGRepresentation(image, 1.0);
     [data writeToFile:[APIManager sharedInstance].m_tmpMediaPath atomically:YES];
@@ -535,6 +561,9 @@ static float fCurrentTime = 0;
     [[NSUserDefaults standardUserDefaults] setObject:STANDARDPHOTO forKey:PHOTOTYPE];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
+    [[Utility sharedUtility] setImageURLWithAsync:[arrOverlays[0] objectForKey:@"filename"] displayImgView:_imgOverlay placeholder:@""];
+    [self checkSelectOverlayButton];
+    
     [self onImageTypeCancel:nil];
 }
 
@@ -546,6 +575,9 @@ static float fCurrentTime = 0;
     
     [[NSUserDefaults standardUserDefaults] setObject:GREENSCREENPHOTO forKey:PHOTOTYPE];
     [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    _imgOverlay.image = nil;
+    [self checkSelectOverlayButton];
     
     [self onImageTypeCancel:nil];
 }
@@ -559,6 +591,9 @@ static float fCurrentTime = 0;
     [[NSUserDefaults standardUserDefaults] setObject:VIDEO forKey:PHOTOTYPE];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
+    [[Utility sharedUtility] setImageURLWithAsync:[arrOverlays[0] objectForKey:@"filename"] displayImgView:_imgOverlay placeholder:@""];
+    [self checkSelectOverlayButton];
+    
     [self onImageTypeCancel:nil];
 }
 
@@ -570,6 +605,9 @@ static float fCurrentTime = 0;
     
     [[NSUserDefaults standardUserDefaults] setObject:ANIMATEDGIF forKey:PHOTOTYPE];
     [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    [[Utility sharedUtility] setImageURLWithAsync:[arrOverlays[0] objectForKey:@"filename"] displayImgView:_imgOverlay placeholder:@""];
+    [self checkSelectOverlayButton];
     
     [self onImageTypeCancel:nil];
 }
@@ -738,16 +776,6 @@ static float fCurrentTime = 0;
     [videolayerInstruction setTransform:videoScale atTime:kCMTimeZero];
     [videolayerInstruction setOpacity:0.0 atTime:self.videoAsset.duration];
     
-    
-    /////////========
-//    AVMutableVideoCompositionLayerInstruction *firstlayerInstruction = [AVMutableVideoCompositionLayerInstruction                                                                    videoCompositionLayerInstructionWithAssetTrack:videoTrack];
-//    [firstlayerInstruction setTransform:videoScale atTime:kCMTimeZero];
-//    [firstlayerInstruction setTransform:CGAffineTransformMakeRotation(M_PI/4) atTime:kCMTimeZero];
-//    
-//    [firstlayerInstruction setOpacity:0.0 atTime:self.videoAsset.duration];
-    
-    /////==============
-    
     // 3.3 - Add instructions
     mainInstruction.layerInstructions = [NSArray arrayWithObjects:videolayerInstruction, nil];
     
@@ -889,7 +917,14 @@ static float fCurrentTime = 0;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSInteger row = [indexPath row];
-    [[Utility sharedUtility] setImageURLWithAsync:[arrOverlays[row] objectForKey:@"filename"] displayImgView:_imgOverlay placeholder:@""];
+    
+    NSString *strType = [[NSUserDefaults standardUserDefaults] objectForKey:PHOTOTYPE];
+    if ([strType isEqualToString:GREENSCREENPHOTO]) {
+        _imgOverlay.image = nil;
+    } else {
+        [[Utility sharedUtility] setImageURLWithAsync:[arrOverlays[row] objectForKey:@"filename"] displayImgView:_imgOverlay placeholder:@""];
+    }
+    
 }
 
 @end

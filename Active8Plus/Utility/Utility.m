@@ -93,12 +93,8 @@
     
     [UIImage imageWithCGImage:chromakeyImage.CGImage];
     
-    CGSize screenSize = [UIScreen mainScreen].bounds.size;
-    
+   
     CGSize newSize = CGSizeMake(imgOverlay.size.width, imgOverlay.size.height);
-    if (screenSize.width < screenSize.height) {
-        newSize = CGSizeMake(imgOverlay.size.height, imgOverlay.size.width);
-    }
     
     UIGraphicsBeginImageContext(newSize);
     
@@ -134,21 +130,21 @@
                  placeholder:(NSString *)_placeholder
 {
     NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:_urlStr]];
-    UIActivityIndicatorView *activities = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [activities setBackgroundColor:[UIColor clearColor]];
-    activities.center = _displayImgView.center;
-    [_displayImgView addSubview:activities];
-    [activities setHidesWhenStopped:YES];
-    [activities startAnimating];
+//    UIActivityIndicatorView *activities = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+//    [activities setBackgroundColor:[UIColor clearColor]];
+//    activities.center = _displayImgView.center;
+//    [_displayImgView addSubview:activities];
+//    [activities setHidesWhenStopped:YES];
+//    [activities startAnimating];
     
     __block UIImageView *_feedImgView = _displayImgView;
     
     [_displayImgView setImageWithURLRequest:request placeholderImage:nil success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image) {
-        [activities stopAnimating];
+//        [activities stopAnimating];
         
         
         [_feedImgView setImage:image];
-        [activities removeFromSuperview];
+//        [activities removeFromSuperview];
         NSLog(@"_displayImgView  setImageWithURLRequest assadfsad");
         dispatch_async(dispatch_get_main_queue(), ^{
             
@@ -157,12 +153,11 @@
         
         
     } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error) {
-//        [activities stopAnimating];
-//        [activities removeFromSuperview];
+
         NSLog(@"setImageWithURLRequest : Error :  %@", error.localizedDescription);
         dispatch_async(dispatch_get_main_queue(), ^{
-            [activities stopAnimating];
-            [activities removeFromSuperview];
+//            [activities stopAnimating];
+//            [activities removeFromSuperview];
         });
     }];
     

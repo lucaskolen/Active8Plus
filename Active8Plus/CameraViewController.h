@@ -19,6 +19,7 @@
 @property(nonatomic, strong) NSMutableArray *arrPortraitOverlays;
 @property(nonatomic, strong) NSMutableArray *arrOverlays;
 
+@property (weak, nonatomic) IBOutlet UIButton *btnSelectOverlay;
 
 @property (weak, nonatomic) IBOutlet UITableView *overlayTable;
 

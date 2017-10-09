@@ -922,6 +922,7 @@
                     <connections>
                         <outlet property="btnCapture" destination="7eZ-Cq-Pyt" id="2RX-Xd-scf"/>
                         <outlet property="btnCheck" destination="MQS-oq-ckW" id="Mdz-5e-eR3"/>
+                        <outlet property="btnSelectOverlay" destination="tHd-zN-sVk" id="6mV-fE-Wsw"/>
                         <outlet property="btnSetting" destination="NHE-vl-rGU" id="8ns-S0-FXZ"/>
                         <outlet property="cameraView" destination="L04-XY-6et" id="fCR-RC-1CC"/>
                         <outlet property="constraintAnimatedGifSettingViewBottom" destination="Ycr-Yt-BEC" id="kyj-uL-vUL"/>
@@ -1054,7 +1055,7 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="300" height="200"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
-                                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="nsM-3m-raz">
+                                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="nsM-3m-raz">
                                                             <rect key="frame" x="0.0" y="0.0" width="300" height="200"/>
                                                         </imageView>
                                                     </subviews>
@@ -1165,7 +1166,7 @@
                             <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IpJ-pU-g1q">
                                 <rect key="frame" x="20" y="108" width="1106" height="737.5"/>
                                 <subviews>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xhw-gR-W58">
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xhw-gR-W58">
                                         <rect key="frame" x="30" y="30" width="1046" height="677.5"/>
                                     </imageView>
                                 </subviews>
@@ -1316,7 +1317,7 @@
                                                 <rect key="frame" x="0.0" y="28" width="301" height="50"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Ow2-MO-icz" id="OsJ-at-BUx">
-                                                    <rect key="frame" x="0.0" y="0.0" width="301" height="50"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="300.5" height="49.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MaF-Et-2Wb">
@@ -1827,7 +1828,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="LlA-xA-6xq" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="335.57833089311856" y="-616.40625"/>
+            <point key="canvasLocation" x="3492" y="37"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="pgw-j1-Cpg">
